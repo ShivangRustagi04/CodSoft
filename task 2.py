@@ -89,19 +89,27 @@ ax.set_ylabel('Year')
 ax.set_title('Box Plot of Year')
 mpl.show()
 
-ax = sb.lineplot(data=movie_file.groupby('Year')['Duration'].mean().reset_index(), x='Year', y='Duration')
-darkgrid_positions = range(min(movie_file['Year']), max(movie_file['Year']) + 1, 5)
-ax.set_title("Average Movie Duration Trends Over the Years")
-ax.set_xticks(darkgrid_positions)
-ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
-ax.set_xlabel("Years")
-ax.set_ylabel('Average Duration (in minutes)')
-mpl.show()
+movie_file = pd.read_csv("C:\\Users\\shiva\\OneDrive\\Desktop\\CodSoft\\IMDb Movies India.csv", encoding='latin1')
 
-ax = sb.boxplot(data=movie_file, y='Duration')
-ax.set_title("Box Plot of Average Movie Durations")
-ax.set_ylabel('Average Duration (in minutes)')
-mpl.show()
+movie_file['Duration'] = movie_file['Duration'].str.extract('(\d+)').astype(float)
+
+
+ax = sb.lineplot(data=movie_file.groupby('Year')['Duration'].mean().reset_index(), x='Year', y='Duration')
+import numpy as np
+import pandas as pd
+import seaborn as sb
+import matplotlib.pyplot as mpl
+
+movie_file = pd.read_csv("C:\\Users\\shiva\\OneDrive\\Desktop\\CodSoft\\IMDb Movies India.csv", encoding='latin1')
+
+
+movie_file['Duration'] = movie_file['Duration'].str.extract('(\d+)').astype(float)
+
+
+movie_file['Year'] = pd.to_numeric(movie_file['Year'], errors='coerce')
+
+ax = sb.lineplot(data=movie_file.groupby('Year')['Duration'].mean().reset_index(), x='Year', y='Duration')
+
 
 Q1 = movie_file['Duration'].quantile(0.25)
 Q3 = movie_file['Duration'].quantile(0.75)
@@ -232,37 +240,7 @@ from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
 from sklearn.neighbors import KNeighborsRegressor
 
-LR = LinearRegression()
-LR.fit(x_train, y_train)
-lr_preds = LR.predict(x_test)
 
-RFR = RandomForestRegressor(n_estimators=100, random_state=1)
-RFR.fit(x_train, y_train)
-rf_preds = RFR.predict(x_test)
-
-DTR = DecisionTreeRegressor(random_state=1)
-DTR.fit(x_train, y_train)
-dt_preds = DTR.predict(x_test)
-
-XGBR = XGBRegressor(n_estimators=100, random_state=1)
-XGBR.fit(x_train, y_train)
-xgb_preds = XGBR.predict(x_test)
-
-GBR = GradientBoostingRegressor(n_estimators=100, random_state=60)
-GBR.fit(x_train, y_train)
-gb_preds = GBR.predict(x_test)
-
-LGBMR = LGBMRegressor(n_estimators=100, random_state=60)
-LGBMR.fit(x_train, y_train)
-lgbm_preds = LGBMR.predict(x_test)
-
-CBR = CatBoostRegressor(n_estimators=100, random_state=1, verbose=False)
-CBR.fit(x_train, y_train)
-catboost_preds = CBR.predict(x_test)
-
-KNR = KNeighborsRegressor(n_neighbors=5)
-KNR.fit(x_train, y_train)
-knn_preds = KNR.predict(x_test)
 
 def evaluate_model(y_true, y_pred, model_name):
     print("Model: ", model_name)
@@ -270,20 +248,4 @@ def evaluate_model(y_true, y_pred, model_name):
     print("Root Mean Squared Error = {:0.2f}\n".format(mean_squared_error(y_true, y_pred, squared=False)))
     return round(score(y_true, y_pred) * 100, 2)
 
-LRScore = evaluate_model(y_test, lr_preds, "Linear Regression")
-RFScore = evaluate_model(y_test, rf_preds, "Random Forest")
-DTScore = evaluate_model(y_test, dt_preds, "Decision Tree")
-XGBScore = evaluate_model(y_test, xgb_preds, "XGBoost")
-GBScore = evaluate_model(y_test, gb_preds, "Gradient Boosting")
-LGBScore = evaluate_model(y_test, lgbm_preds, "LightGBM")
-CBRScore = evaluate_model(y_test, catboost_preds, "CatBoost")
-KNNScore = evaluate_model(y_test, knn_preds, "K Nearest Neighbors")
 
-models = pd.DataFrame(
-    {
-        "MODELS": ["Linear Regression", "Random Forest", "Decision Tree", "XGBoost", "Gradient Boosting", "LightGBM", "CatBoost", "K Nearest Neighbors"],
-        "SCORES": [LRScore, RFScore, DTScore, XGBScore, GBScore, LGBScore, CBRScore, KNNScore]
-    }
-)
-
-models.sort_values(by='SCORES', ascending=False)

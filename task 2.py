@@ -247,5 +247,3 @@ def evaluate_model(y_true, y_pred, model_name):
     print("Accuracy = {:0.2f}%".format(score(y_true, y_pred) * 100))
     print("Root Mean Squared Error = {:0.2f}\n".format(mean_squared_error(y_true, y_pred, squared=False)))
     return round(score(y_true, y_pred) * 100, 2)
-
-
